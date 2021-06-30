@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+// Script initial de MiddleVR 2, juste la physique de la rotation a ete changee,
+// Script de deplacement classique
+
 [RequireComponent(typeof(CharacterController))]
 public class SVRNavigationController : MonoBehaviour
 {

@@ -127,8 +127,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Texture: {fileID: 8400000, guid: e83425b85d03abc4388ea3bfcf1381d8, type: 2}
   m_UVRect:
     serializedVersion: 2
@@ -315,7 +313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d558beba3d9947408cebabb2665b6d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Text: {fileID: 1921567504175260277}
+  cameraText: {fileID: 1921567504175260277}
   targetTexture: {fileID: 8400000, guid: e83425b85d03abc4388ea3bfcf1381d8, type: 2}
   mWidth: 1920
   mHeight: 1080
@@ -459,8 +457,6 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 28

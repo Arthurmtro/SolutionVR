@@ -62,11 +62,11 @@ public class SVRMenuManager : MonoBehaviour
         if (m_Initializing)
         {
             // Attach to VRSystemCenterNode
-            if (m_SystemCenterNode == null)
+            if (!m_SystemCenterNode)
             {
                 vrNode3D systemCenterNode = MiddleVR.VRDisplayMgr.GetNodeByTag("VRSystemCenter");
                 m_SystemCenterNode = MVRNodesMapper.Instance.GetNode(systemCenterNode);
-                if (m_SystemCenterNode == null)
+                if (!m_SystemCenterNode)
                 {
                     return;
                 }
@@ -75,10 +75,10 @@ public class SVRMenuManager : MonoBehaviour
             transform.parent = m_SystemCenterNode.transform;
 
             // Retrieve Head
-            if (m_HeadNode == null)
+            if (!m_HeadNode)
             {
                 m_HeadNode = GameObject.Find("HeadNode");
-                if (m_HeadNode == null)
+                if (!m_HeadNode)
                 {
                     return;
                 }

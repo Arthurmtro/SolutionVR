@@ -7,7 +7,7 @@ public class SVRMenu : MonoBehaviour
 {
     [Header("General")]
     [HideInInspector] public SVRManager svrManager;
-    [SerializeField] private GameObject[] CanvasArray = null;
+    [SerializeField] private GameObject[] canvasArray = null;
 
     [Header("Fly Config")]
     public Sprite[] flyModeImg;
@@ -16,44 +16,50 @@ public class SVRMenu : MonoBehaviour
     [Header("Tsv Config")]
     [SerializeField] private GameObject btnTemplate = null;
     [HideInInspector] public List<GameObject> tsvGameObjects = new List<GameObject>();
-    private bool tsvMode = false;
+    private bool _tsvMode = false;
 
     [Header("Screenshot Camera Config")]
     [SerializeField] private GameObject screenCamPref = null;
     [SerializeField] private GameObject screenCamButton = null;
-    private bool screenCamEnabled = false;
-    private GameObject screenCamInst;
+    private bool _screenCamEnabled = false;
+    private GameObject _screenCamInst;
 
     [Header("Config Config")]
     [SerializeField] private GameObject configButton = null;
     [SerializeField] private GameObject configCanvas = null;
-    private bool showConfig;
+    private bool _showConfig;
 
     [Header("Config Config")]
     [SerializeField] private GameObject playerSpeedButton = null;
     [SerializeField] private GameObject playerSpeedCanvas = null;
-    private bool showPlayerSpeed;
+    private bool _showPlayerSpeed;
 
-    void Start()
+    private Text _configCanvasText;
+    private ConfigScript _configScript;
+
+    private Text _playerSpeedCanvasText;
+    private SVRNavigationController _svrNavigationController;
+
+    private void Start()
     {
         svrManager = FindObjectOfType<SVRManager>();
 
         TSVInit();
 
-        CanvasArray[0].SetActive(true);
-        CanvasArray[1].SetActive(false);
-        CanvasArray[2].SetActive(false);
-        CanvasArray[3].SetActive(false);
+        canvasArray[0].SetActive(true);
+        canvasArray[1].SetActive(false);
+        canvasArray[2].SetActive(false);
+        canvasArray[3].SetActive(false);
 
         // Determine si le bouton tsv doit etre desactiver ou non
         if (tsvGameObjects.Count < 1)
         {
-            GameObject.Find("TSVButton").GetComponent<Button>().interactable = true;
+            GameObject.Find("TSVButton").GetComponent<Button>().interactable = false;
             GameObject.Find("TSVButton").GetComponentsInChildren<Image>()[1].color = Color.gray;
         }
 
         // Si l'user n'a pas le droit de changer de config le boutton est desactive
-        if (!GameObject.Find("SolutionVRManager").GetComponent<SVRManager>().UserCanUseConfig)
+        if (!GameObject.Find("SolutionVRManager").GetComponent<SVRManager>().userCanUseConfig)
         {
             configButton.GetComponentsInChildren<Image>()[1].color = Color.gray;
             configButton.GetComponentInChildren<Text>().text = "Config disabled";
@@ -61,19 +67,25 @@ public class SVRMenu : MonoBehaviour
 
         // Vide la liste car inutile desormais
         tsvGameObjects.Clear();
+
+        _configCanvasText = configCanvas.GetComponentsInChildren<Text>()[1];
+        _configScript = GameObject.Find("SolutionVRManager").GetComponent<ConfigScript>();
+
+        _playerSpeedCanvasText = playerSpeedCanvas.GetComponentsInChildren<Text>()[1];
+        _svrNavigationController = FindObjectOfType<SVRNavigationController>();
     }
 
-    void Update()
+    private void Update()
     {
-        if (svrManager == null)
+        if (!svrManager)
             return;
 
         // Modification des textes
-        if (showConfig)
-            configCanvas.GetComponentsInChildren<Text>()[1].text = GameObject.Find("SolutionVRManager").GetComponent<ConfigScript>().condition.ToString();
+        if (_showConfig)
+            _configCanvasText.text = _configScript.condition.ToString();
 
-        if (showPlayerSpeed)
-            playerSpeedCanvas.GetComponentsInChildren<Text>()[1].text = "X " + FindObjectOfType<SVRNavigationController>().SpeedMultiplier.ToString();
+        if (_showPlayerSpeed)
+            _playerSpeedCanvasText.text = "X " + _svrNavigationController.SpeedMultiplier;
     }
 
     // Toggle fly mode et changement du texte
@@ -95,33 +107,33 @@ public class SVRMenu : MonoBehaviour
     // Toggle le mode tsv preview pour pouvoir ce teleporter
     public void ToggleTSVMode()
     {
-        tsvMode = !tsvMode;
-        if(tsvMode)
+        _tsvMode = !_tsvMode;
+        if(_tsvMode)
         {
-            CanvasArray[0].SetActive(false);
-            CanvasArray[1].SetActive(true);
+            canvasArray[0].SetActive(false);
+            canvasArray[1].SetActive(true);
         }
         else
         {
-            CanvasArray[0].SetActive(true);
-            CanvasArray[1].SetActive(false);
+            canvasArray[0].SetActive(true);
+            canvasArray[1].SetActive(false);
         }
     }
 
     // Active ou desactive la camera
     public void ToggleScreenshotCam()
     {
-        screenCamEnabled = !screenCamEnabled;
-        if (screenCamEnabled)
+        _screenCamEnabled = !_screenCamEnabled;
+        if (_screenCamEnabled)
         {
-            screenCamInst = Instantiate(screenCamPref);
-            screenCamInst.transform.SetPositionAndRotation(new Vector3(transform.position.x - 0.5f, transform.position.y, transform.position.z) , transform.rotation);
+            _screenCamInst = Instantiate(screenCamPref);
+            _screenCamInst.transform.SetPositionAndRotation(new Vector3(transform.position.x - 0.5f, transform.position.y, transform.position.z) , transform.rotation);
             screenCamButton.GetComponentsInChildren<Image>()[1].color = Color.white;                
             screenCamButton.GetComponentInChildren<Text>().text = "Disable Camera";
         }
-        else if(screenCamInst != null)
+        else if(_screenCamInst != null)
         {
-            Destroy(screenCamInst);
+            Destroy(_screenCamInst);
             screenCamButton.GetComponentsInChildren<Image>()[1].color = Color.gray;
             screenCamButton.GetComponentInChildren<Text>().text = "Enable Camera";
         }
@@ -131,16 +143,16 @@ public class SVRMenu : MonoBehaviour
     public void ToggleConfigGUI()
     {
 
-        showConfig = !showConfig;
-        if (showConfig)
+        _showConfig = !_showConfig;
+        if (_showConfig)
         {
-            CanvasArray[2].SetActive(true);
+            canvasArray[2].SetActive(true);
             configButton.GetComponentsInChildren<Image>()[1].color = Color.white;
             configButton.GetComponentInChildren<Text>().text = "Hide Config";
         }
         else
         {
-            CanvasArray[2].SetActive(false);
+            canvasArray[2].SetActive(false);
             configButton.GetComponentsInChildren<Image>()[1].color = Color.gray;
             configButton.GetComponentInChildren<Text>().text = "Show Config";
         }
@@ -150,15 +162,15 @@ public class SVRMenu : MonoBehaviour
     public void TogglePlayerSpeedGUI()
     {
 
-        showPlayerSpeed = !showPlayerSpeed;
-        if (showPlayerSpeed)
+        _showPlayerSpeed = !_showPlayerSpeed;
+        if (_showPlayerSpeed)
         {
-            CanvasArray[3].SetActive(true);
+            canvasArray[3].SetActive(true);
             playerSpeedButton.GetComponentsInChildren<Image>()[1].color = Color.white;
         }
         else
         {
-            CanvasArray[3].SetActive(false);
+            canvasArray[3].SetActive(false);
             playerSpeedButton.GetComponentsInChildren<Image>()[1].color = Color.gray;
         }
     }

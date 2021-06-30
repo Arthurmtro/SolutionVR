@@ -14,9 +14,11 @@ using System.IO;
 
 public class SVRManager : MonoBehaviour
 {
+    private VRManagerScript _vrManagerScript;
+    
     [Header("Configuration")]
-    public string SessionPath = "1-SRV-Images";
-    public bool UserCanUseConfig;
+    public string sessionPath = "1-SRV-Images";
+    public bool userCanUseConfig;
     
     [Header("WandCube")]
     [SerializeField] private Mesh wandCubeMesh = null;
@@ -24,41 +26,36 @@ public class SVRManager : MonoBehaviour
 
     [Header("SceneOptions")]
     public bool flyingMode;
-    private SVRNavigationController srvNavController;
+    private SVRNavigationController _srvNavController;
 
     private void Awake()
     {
         // Creation d'un fichier qui stockera les photos prise lors de la session
-        if (!Directory.Exists(Application.dataPath + "/../" + SessionPath))
-        {
-            Directory.CreateDirectory(Application.dataPath + "/../" + SessionPath);
-        }
+        if (!Directory.Exists(Application.dataPath + "/../" + sessionPath))
+            Directory.CreateDirectory(Application.dataPath + "/../" + sessionPath);
 
         // On attribue notre Menu personnaliser au component de MiddleVR
         GetComponentInChildren<SVRMenuManager>().WandCubeMesh = wandCubeMesh;
         GetComponentInChildren<SVRMenuManager>().WandMat = wandMat;
-        Destroy(GetComponentInChildren<VRMenuManager>());
-    }
-
-    private void Start()
-    {
-        srvNavController = GameObject.Find("PlayerBody").GetComponent<SVRNavigationController>();
+        
+        _srvNavController = GameObject.Find("PlayerBody").GetComponent<SVRNavigationController>();
+        _vrManagerScript = GetComponentInChildren<VRManagerScript>();
     }
 
     private void Update()
     {
         if (flyingMode)
         {
-            srvNavController.GravityMultiplier = 0f;
-            srvNavController.isFlying = true;
+            _srvNavController.GravityMultiplier = 0f;
+            _srvNavController.isFlying = true;
         }
         else
         {
-            srvNavController.GravityMultiplier = 9.81f;
-            srvNavController.isFlying = false;
+            _srvNavController.GravityMultiplier = 9.81f;
+            _srvNavController.isFlying = false;
         }
 
-        GetComponentInChildren<VRManagerScript>().Fly = flyingMode;
+        _vrManagerScript.Fly = flyingMode;
     }
 }
 

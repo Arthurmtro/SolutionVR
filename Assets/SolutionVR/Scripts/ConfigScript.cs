@@ -1,18 +1,12 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 
 // Ce script est un model qui permet d'avoir plusieurs
 // configurations via un Switch case
 public class ConfigScript : MonoBehaviour
 {
-    public int condition;
+    [HideInInspector] public uint condition = 0;
     [SerializeField] private KeyCode decrementerValeur = KeyCode.Alpha1;
     [SerializeField] private KeyCode incrementerValeur = KeyCode.Alpha2;
-
-    void Start()
-    {
-        condition = 0;
-    }
 
     void Update()
     {
@@ -24,10 +18,7 @@ public class ConfigScript : MonoBehaviour
                 //Script
                 break;
             case 2:
-                if(SceneManager.GetActiveScene().name != "Scene2")
-                    SceneManager.LoadSceneAsync("Scene2");
-                else
-                    SceneManager.LoadSceneAsync(0);
+                //Script
                 break;
             default:
                 // Ne s'effectue que si la condition n'active aucun des 'case'
@@ -44,7 +35,6 @@ public class ConfigScript : MonoBehaviour
             condition++;
         if (Input.GetKeyDown(decrementerValeur))
             condition--;
-
     }
 
     // Fonctions liee a l'interface de config

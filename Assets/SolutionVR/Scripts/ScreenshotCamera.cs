@@ -5,54 +5,59 @@ using System.Collections;
 
 public class ScreenshotCamera : MonoBehaviour
 {
-    [SerializeField] private Text Text = null;
     [SerializeField] private RenderTexture targetTexture = null;
     [SerializeField] private int mWidth = 1920, mHeight = 1080;
-    private string sessionPath;
-    private bool CooldownComplete;
+    [SerializeField] private uint wandButtonIndex = 1;
+    private Text _cameraText = null;
+    private string _sessionPath;
+    private bool _cooldownComplete;
+    private Camera _cam;
 
-    void Start()
+    private void Start()
     {
-        sessionPath = GameObject.Find("SolutionVRManager").GetComponent<SVRManager>().SessionPath;
-        CooldownComplete = true;
+        _sessionPath = GameObject.Find("SolutionVRManager").GetComponent<SVRManager>().sessionPath;
+        _cooldownComplete = true;
+        _cam = GetComponent<Camera>();
+        _cameraText = transform.GetChild(0).gameObject.GetComponentInChildren<Text>();
     }
 
-    void Update()
+    private void Update()
     {
-        if (MiddleVR.VRDeviceMgr.IsWandButtonToggled(1))
+        if (!_cooldownComplete)
+            return;
+        
+        if (MiddleVR.VRDeviceMgr.IsWandButtonToggled(wandButtonIndex))
             TakeScreenshot();
     }
-    public string ScreenShotName()
+    private string ScreenShotName()
     {
         // Creation d'un fichier qui stockera les photos prise lors de la session
-        if (!Directory.Exists(Application.dataPath + "/../" + sessionPath + "/screenshots/" + System.DateTime.Now.ToString("dd-MM-yyyy")))
+        if (!Directory.Exists(Application.dataPath + "/../" +_sessionPath + "/screenshots/" + System.DateTime.Now.ToString("dd-MM-yyyy")))
         {
-            Directory.CreateDirectory(Application.dataPath + "/../" + sessionPath + "/screenshots/" + System.DateTime.Now.ToString("dd-MM-yyyy"));
+            Directory.CreateDirectory(Application.dataPath + "/../" +_sessionPath + "/screenshots/" + System.DateTime.Now.ToString("dd-MM-yyyy"));
         }
 
         return string.Format("{0}/screenshots/" + System.DateTime.Now.ToString("dd-MM-yyyy") + "/screen_{1}x{2}_{3}.png",
-                             Application.dataPath + "/../" + sessionPath,
+                             Application.dataPath + "/../" +_sessionPath,
                              mWidth, mHeight,
                              System.DateTime.Now.ToString("HH-mm-ss"));
     }
 
     private void TakeScreenshot()
     {
-        if (!CooldownComplete)
-            return;
 
         Rect rect = new Rect(0, 0, mWidth, mHeight);
         RenderTexture renderTexture = new RenderTexture(mWidth, mHeight, 24);
         Texture2D screenShot = new Texture2D(mWidth, mHeight, TextureFormat.RGBA32, false);
 
-        GetComponent<Camera>().targetTexture = renderTexture;
-        GetComponent<Camera>().Render();
+        _cam.targetTexture = renderTexture;
+        _cam.Render();
 
         RenderTexture.active = renderTexture;
         screenShot.ReadPixels(rect, 0, 0);
         screenShot.Apply();
 
-        GetComponent<Camera>().targetTexture = targetTexture;
+        _cam.targetTexture = targetTexture;
         RenderTexture.active = null;
 
         Destroy(renderTexture);
@@ -60,17 +65,17 @@ public class ScreenshotCamera : MonoBehaviour
         byte[] bytes = screenShot.EncodeToPNG();
         string filename = ScreenShotName();
         File.WriteAllBytes(filename, bytes);
-        Debug.Log(string.Format("Took screenshot to: {0}", filename));
+        // Debug.Log(string.Format("Took screenshot to: {0}", filename));
 
         StartCoroutine(Cooldown());
     }
 
-    IEnumerator Cooldown()
+    private IEnumerator Cooldown()
     {
-        CooldownComplete = false;
-        Text.text = "Screenshot taken, now wait";
+        _cooldownComplete = false;
+        _cameraText.text = "Screenshot taken, now wait";
         yield return new WaitForSeconds(1.5f);
-        Text.text = "Press the first left button";
-        CooldownComplete = true;
+        _cameraText.text = "Press the first left button";
+        _cooldownComplete = true;
     }
 }
